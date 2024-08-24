@@ -138,7 +138,8 @@ const UserLookup = () => {
             <Card.Body>
               <Card.Title>{stats.leetcode_username}</Card.Title>
               <Card.Text style={{ color: "black" }}>
-                <strong>Ranking:</strong> {stats.ranking}
+                <strong>Ranking:</strong>{" "}
+                {stats.ranking.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </Card.Text>
             </Card.Body>
           </Card>
