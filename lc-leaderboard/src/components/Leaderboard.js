@@ -1,4 +1,3 @@
-// src/components/Leaderboard.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Container } from "react-bootstrap";
@@ -23,14 +22,14 @@ const Leaderboard = () => {
     <Container>
       <h1 className="text-center my-4">Leaderboard</h1>
       <Table striped bordered hover>
-        <thead>
+        <thead style={{ color: "var(--text-color)" }}>
           <tr>
             <th>Rank</th>
             <th>Username</th>
             <th>Points</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ color: "var(--text-color)" }}>
           {leaderboard.map((user, index) => (
             <tr key={index}>
               <td>{index + 1}</td>

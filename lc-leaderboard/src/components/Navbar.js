@@ -1,25 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar, Nav, Button, Image } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useUser } from "../UserContext"; // import useUser hook
 import "./Navbar.css";
 
-// src/components/Navbar.js
-
 const CustomNavbar = () => {
   const { user } = useUser(); // get user from context
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem("theme") === "dark"
+  );
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add("dark-mode");
+    } else {
+      document.body.classList.remove("dark-mode");
+    }
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   const handleLogout = () => {
-    // Clear token and user data on logout
     localStorage.removeItem("access_token");
-    window.location.reload(); // Reload page to reflect changes
+    window.location.reload();
+  };
+
+  const toggleDarkMode = () => {
+    setDarkMode((prevMode) => !prevMode);
   };
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Navbar.Brand href="/" className="brand-padding">
         <b>LC Leaderboard</b>
-      </Navbar.Brand>{" "}
+      </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
@@ -41,19 +54,48 @@ const CustomNavbar = () => {
                 />
                 <b>{user.username}</b>
               </Navbar.Text>
-              <div style={{ marginRight: "10px" }}></div> {/* Add padding */}
-              <Button variant="outline-danger" onClick={handleLogout}>
+              <Button
+                variant="outline-danger"
+                onClick={handleLogout}
+                style={{ marginRight: "10px", marginLeft: "10px" }}
+              >
                 Logout
               </Button>
             </>
           ) : (
             <Button
-              variant="outline-primary"
+              variant="primary"
               href="http://localhost:5000/login"
+              style={{
+                marginRight: "10px",
+                marginLeft: "10px",
+                backgroundColor: "#7289DA",
+                borderColor: "#7289DA",
+                onMouseOver: {
+                  backgroundColor: "#677bc4",
+                  borderColor: "#677bc4",
+                },
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = "#4f5f98";
+                e.target.style.borderColor = "#4f5f98";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = "#7289DA";
+                e.target.style.borderColor = "#7289DA";
+              }}
             >
               Login with Discord
             </Button>
           )}
+          {/* Add Dark Mode Toggle Button */}
+          <Button
+            variant="outline-light"
+            onClick={toggleDarkMode}
+            style={{ marginRight: "10px" }}
+          >
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </Button>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

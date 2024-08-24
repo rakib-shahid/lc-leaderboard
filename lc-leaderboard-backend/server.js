@@ -315,5 +315,29 @@ app.get("/api/leetcode_lookup", async (req, res) => {
   }
 });
 
+app.get("/api/leetcode_ac", async (req, res) => {
+  const leetcodeUsername = req.headers["leetcode-username"];
+
+  if (!leetcodeUsername) {
+    return res
+      .status(400)
+      .json({ message: "LeetCode username header is required" });
+  }
+
+  try {
+    // Fetch LeetCode stats from external API
+    const response = await fetch(
+      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/acSubmission`
+    );
+    const data = await response.json();
+
+    //   send the data response
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching LeetCode stats:", error);
+    res.status(500).json({ message: "Error fetching LeetCode stats" });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

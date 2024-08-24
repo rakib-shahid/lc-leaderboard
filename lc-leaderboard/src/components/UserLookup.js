@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useUser } from "../UserContext"; // import useUser hook
+import { SiPython, SiJavascript, SiCplusplus } from "react-icons/si";
+import { FaJava } from "react-icons/fa";
 
 const UserLookup = () => {
   const { user } = useUser();
   const [username, setUsername] = useState(user.username || ""); // Default to logged-in user's Discord username
   const [message, setMessage] = useState("");
+  const [ac, setAC] = useState(null);
   const [stats, setStats] = useState(null); // State to hold LeetCode stats
 
   // Fetch LeetCode stats based on Discord username
@@ -63,6 +66,25 @@ const UserLookup = () => {
     }
   };
 
+  const fetchLeetcodeAC = async (leetCodeUsername) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/leetcode_ac",
+        {
+          headers: {
+            "leetcode-username": leetCodeUsername,
+          },
+        }
+      );
+      setAC(response.data);
+
+      console.log("LeetCode AC from LeetCode lookup:", response.data);
+      console.log("AC", ac.submission);
+    } catch (error) {
+      console.error("Error fetching LeetCode AC from LeetCode lookup:", error);
+    }
+  };
+
   useEffect(() => {
     // Fetch stats for the logged-in user when the component mounts
     fetchDiscordStats(user.username);
@@ -71,7 +93,7 @@ const UserLookup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-    setStats(null); // Clear current stats
+    setStats(null);
 
     // Try Discord lookup first
     try {
@@ -80,6 +102,7 @@ const UserLookup = () => {
       // If Discord lookup fails, try LeetCode lookup
       fetchLeetCodeStats(username);
     }
+    fetchLeetcodeAC(stats.leetcode_username);
   };
 
   return (
@@ -108,18 +131,63 @@ const UserLookup = () => {
           </Alert>
         )}
       </Form>
-      {/* Display LeetCode stats */}
       {stats ? (
         <div className="text-center mt-4">
           <Card style={{ width: "18rem", margin: "0 auto" }}>
             <Card.Img variant="top" src={stats.avatar} />
             <Card.Body>
               <Card.Title>{stats.leetcode_username}</Card.Title>
-              <Card.Text>
+              <Card.Text style={{ color: "black" }}>
                 <strong>Ranking:</strong> {stats.ranking}
               </Card.Text>
             </Card.Body>
           </Card>
+          {ac && ac.submission.length > 0 ? (
+            <div>
+              <h3 className="mt-4">Accepted Submissions</h3>
+              <table
+                className="table table-striped mt-4"
+                style={{ width: "50%", align: "center", margin: "0 auto" }}
+              >
+                <thead>
+                  <tr>
+                    <th>Problem</th>
+                    <th>Timestamp</th>
+                    <th>Language</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ac.submission.slice(0, 5).map((submission, index) => (
+                    <tr key={index}>
+                      <td>{submission.title}</td>
+                      <td>
+                        {new Date(submission.timestamp * 1000).toLocaleString()}
+                      </td>
+                      <td>
+                        {submission.lang.toLowerCase().includes("python") ? (
+                          <SiPython />
+                        ) : submission.lang
+                            .toLowerCase()
+                            .includes("javascript") ? (
+                          <SiJavascript />
+                        ) : submission.lang.toLowerCase().includes("java") ? (
+                          <FaJava />
+                        ) : submission.lang.toLowerCase().includes("cpp") ||
+                          submission.lang.toLowerCase().includes("c++") ? (
+                          <SiCplusplus />
+                        ) : (
+                          submission.lang
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr key="0"></tr>
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>No accepted submissions available.</p>
+          )}
         </div>
       ) : (
         <div className="text-center mt-4">

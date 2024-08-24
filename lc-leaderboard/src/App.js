@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import CustomNavbar from "./components/Navbar";
@@ -11,14 +10,15 @@ function App() {
   return (
     <Router>
       <CustomNavbar />
-      <div className="container">
+      {/* Wrap the main content in a div that uses the theme variables */}
+      <div className="main-content">
         <Routes>
-          <Route path="/" element={<Leaderboard />} />{" "}
+          <Route path="/" element={<Leaderboard />} />
           <Route
             path="/userlookup"
             element={<ProtectedRoute component={UserLookup} />}
           />
-          <Route path="/callback" element={<Callback />} />{" "}
+          <Route path="/callback" element={<Callback />} />
         </Routes>
       </div>
     </Router>
