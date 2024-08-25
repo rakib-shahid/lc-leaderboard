@@ -19,7 +19,7 @@ const Callback = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.user) {
-            console.log("Logged in successfully as:", data.user.username);
+            console.log("Logged in successfully as:", data.user.global_name);
             console.log("User id:", data.user.id);
             console.log("User avatar:", data.user.avatar);
             // Store token and user data in local storage

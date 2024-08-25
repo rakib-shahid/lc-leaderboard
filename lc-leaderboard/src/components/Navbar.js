@@ -9,6 +9,7 @@ const CustomNavbar = () => {
   const [darkMode, setDarkMode] = useState(
     () => localStorage.getItem("theme") === "dark"
   );
+  const [profilePicture, setProfilePicture] = useState("");
 
   useEffect(() => {
     if (darkMode) {
@@ -18,6 +19,13 @@ const CustomNavbar = () => {
     }
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
+
+  // Effect to update the profile picture when the user changes
+  useEffect(() => {
+    if (user && user.profilePicture) {
+      setProfilePicture(user.profilePicture);
+    }
+  }, [user]); // Depend on the `user` object
 
   const handleLogout = () => {
     localStorage.removeItem("access_token");
@@ -48,11 +56,11 @@ const CustomNavbar = () => {
             <>
               <Navbar.Text className="d-flex align-items-center">
                 <Image
-                  src={user.profilePicture}
+                  src={profilePicture}
                   roundedCircle
                   style={{ width: "30px", height: "30px", marginRight: "10px" }}
                 />
-                <b>{user.username}</b>
+                <b>{user.global_name}</b>
               </Navbar.Text>
               <Button
                 variant="outline-danger"

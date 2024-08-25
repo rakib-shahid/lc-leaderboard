@@ -4,6 +4,8 @@ a leaderboard to encourage leetcode
 
 ### Changelog
 
+- Fixed lookup desync bug
+- Fixed navbar showing wrong discord username
 - Added accepted submission stats
 - Added dark mode
 - Added discord login

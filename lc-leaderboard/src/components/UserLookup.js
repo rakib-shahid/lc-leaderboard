@@ -7,7 +7,7 @@ import { FaJava } from "react-icons/fa";
 
 const UserLookup = () => {
   const { user } = useUser();
-  const [username, setUsername] = useState(user.username || ""); // Default to logged-in user's Discord username
+  const [username, setUsername] = useState(user.global_name || ""); // Default to logged-in user's Discord username
   const [message, setMessage] = useState("");
   const [ac, setAC] = useState(null);
   const [stats, setStats] = useState(null); // State to hold LeetCode stats
@@ -88,8 +88,8 @@ const UserLookup = () => {
 
   useEffect(() => {
     // Fetch stats for the logged-in user when the component mounts
-    fetchDiscordStats(user.username);
-  }, [user.username]);
+    fetchDiscordStats(user.global_name);
+  }, [user.global_name]);
 
   useEffect(() => {
     if (stats && stats.leetcode_username) {
@@ -145,7 +145,7 @@ const UserLookup = () => {
             <Card.Body>
               <Card.Title>{stats.leetcode_username}</Card.Title>
               <Card.Text style={{ color: "black" }}>
-                <strong>Ranking:</strong>{" "}
+                <strong>Leetcode Ranking:</strong>{" "}
                 {stats.ranking.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </Card.Text>
             </Card.Body>
