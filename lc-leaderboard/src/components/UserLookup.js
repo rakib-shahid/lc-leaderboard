@@ -56,7 +56,7 @@ const UserLookup = () => {
         return;
       }
       setStats(response.data);
-      console.log("LeetCode stats from LeetCode lookup:", response.data);
+      //   console.log("LeetCode stats from LeetCode lookup:", response.data);
     } catch (error) {
       console.error(
         "Error fetching LeetCode stats from LeetCode lookup:",
@@ -78,8 +78,8 @@ const UserLookup = () => {
       );
       setAC(response.data);
 
-      console.log("LeetCode AC from LeetCode lookup:", response.data);
-      console.log("AC", ac.submission);
+      //   console.log("LeetCode AC from LeetCode lookup:", response.data);
+      //   console.log("AC", ac.submission);
       return true;
     } catch (error) {
       console.error("Error fetching LeetCode AC from LeetCode lookup:", error);
@@ -110,6 +110,7 @@ const UserLookup = () => {
       // If Discord lookup fails, try LeetCode lookup
       await fetchLeetCodeStats(username);
     }
+    // console.log("local ranking", stats.local_ranking);
   };
 
   return (
@@ -140,13 +141,39 @@ const UserLookup = () => {
       </Form>
       {stats ? (
         <div className="text-center mt-4">
-          <Card style={{ width: "18rem", margin: "0 auto" }}>
+          <Card
+            style={{
+              transition: "ease-in",
+              transitionDuration: "0.3s",
+              width: "18rem",
+              margin: "0 auto",
+            }}
+          >
             <Card.Img variant="top" src={stats.avatar} />
             <Card.Body>
               <Card.Title>{stats.leetcode_username}</Card.Title>
               <Card.Text style={{ color: "black" }}>
                 <strong>Leetcode Ranking:</strong>{" "}
-                {stats.ranking.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                <>
+                  {stats.ranking != null
+                    ? stats.ranking
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    : "N/A"}
+                  <br />
+                  {stats.local_ranking === -1 ? (
+                    <p style={{ color: "red" }}>
+                      Not registered to leaderboard
+                    </p>
+                  ) : (
+                    <>
+                      <strong>Local Ranking: </strong>
+                      {stats.local_ranking == 1
+                        ? stats.local_ranking + "👑"
+                        : stats.local_ranking}
+                    </>
+                  )}
+                </>
               </Card.Text>
             </Card.Body>
           </Card>
