@@ -302,11 +302,19 @@ app.get("/api/leetcode_lookup", async (req, res) => {
       `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
     );
     const data = await response.json();
-
+    localrank = -1;
+    // calculate the local ranking of the user in the points table
+    const result = await pool.query(
+      `SELECT ranking FROM (SELECT user_id, points, RANK() OVER (ORDER BY points DESC) AS ranking FROM points) ranked_points JOIN users ON ranked_points.user_id = users.id WHERE users.username = '${leetcodeUsername}';`
+    );
+    if (result.rows.length != 0) {
+      localrank = result.rows[0].ranking;
+    }
     // Send the LeetCode stats
     res.json({
       leetcode_username: data.username,
       ranking: data.ranking,
+      local_ranking: localrank,
       avatar: data.avatar,
     });
   } catch (error) {

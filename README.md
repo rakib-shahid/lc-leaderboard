@@ -4,6 +4,7 @@ a leaderboard to encourage leetcode
 
 ### Changelog
 
+- Added local ranking to leetcode lookup
 - Fixed lookup desync bug
 - Fixed navbar showing wrong discord username
 - Added accepted submission stats
