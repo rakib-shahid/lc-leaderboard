@@ -15,7 +15,7 @@ a leaderboard to encourage leetcode
 ### To-do
 
 - ~~show 5 most recent accepted submission for user lookup~~
-  - fix default user ac not available upon loading lookup
+  - ~~fix default user ac not available upon loading lookup~~
 - fix fetchstat logic, not happy with current implementation
 - create backend that awards points
 - create discord bot that registers users
