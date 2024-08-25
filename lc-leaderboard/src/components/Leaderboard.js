@@ -25,7 +25,7 @@ const Leaderboard = () => {
         <thead style={{ color: "var(--text-color)" }}>
           <tr>
             <th>Rank</th>
-            <th>Username</th>
+            <th>Leetcode Username</th>
             <th>Points</th>
           </tr>
         </thead>

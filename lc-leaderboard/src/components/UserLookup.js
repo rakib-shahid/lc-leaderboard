@@ -80,6 +80,7 @@ const UserLookup = () => {
 
       console.log("LeetCode AC from LeetCode lookup:", response.data);
       console.log("AC", ac.submission);
+      return true;
     } catch (error) {
       console.error("Error fetching LeetCode AC from LeetCode lookup:", error);
     }
@@ -90,19 +91,25 @@ const UserLookup = () => {
     fetchDiscordStats(user.username);
   }, [user.username]);
 
+  useEffect(() => {
+    if (stats && stats.leetcode_username) {
+      fetchLeetcodeAC(stats.leetcode_username);
+    }
+  }, [stats]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setStats(null);
+    setAC(null); // Clear AC data on new search
 
     // Try Discord lookup first
     try {
-      fetchDiscordStats(username);
-    } catch {
+      await fetchDiscordStats(username);
+    } catch (error) {
       // If Discord lookup fails, try LeetCode lookup
-      fetchLeetCodeStats(username);
+      await fetchLeetCodeStats(username);
     }
-    fetchLeetcodeAC(stats.leetcode_username);
   };
 
   return (
