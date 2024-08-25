@@ -179,7 +179,7 @@ const UserLookup = () => {
           </Card>
           {ac && ac.submission.length > 0 ? (
             <div>
-              <h3 className="mt-4">Accepted Submissions</h3>
+              <h3 className="mt-4">5 Latest Accepted Submissions</h3>
               <table
                 className="table table-striped mt-4"
                 style={{ width: "50%", align: "center", margin: "0 auto" }}

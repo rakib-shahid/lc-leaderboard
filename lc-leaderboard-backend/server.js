@@ -69,7 +69,7 @@ app.get("/callback", async (req, res) => {
 
     const data = await response.json();
     const { access_token } = data;
-    console.log("Access Token:", access_token);
+    // console.log("Access Token:", access_token);
 
     // Fetch user details from Discord API
     const userResponse = await fetch("https://discord.com/api/v10/users/@me", {
@@ -118,9 +118,9 @@ app.get("/user", async (req, res) => {
     }
 
     const user = await response.json();
-    console.log("User:", user);
-    console.log("User ID:", user.id);
-    console.log("User avatar:", user.avatar);
+    // console.log("User:", user);
+    // console.log("User ID:", user.id);
+    // console.log("User avatar:", user.avatar);
     const profilePictureUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
 
     res.json({
