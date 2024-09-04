@@ -323,12 +323,8 @@ app.get("/api/leetcode_ac", async (req, res) => {
 });
 
 // SSL/TLS certificate files
-const privateKey = fs.readFileSync(
-  "/etc/letsencrypt/live/server.rakibshahid.com/privkey.pem"
-);
-const certificate = fs.readFileSync(
-  "/etc/letsencrypt/live/server.rakibshahid.com/fullchain.pem"
-);
+const privateKey = fs.readFileSync("privkey.pem");
+const certificate = fs.readFileSync("fullchain.pem");
 
 const credentials = { key: privateKey, cert: certificate };
 
