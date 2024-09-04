@@ -3,6 +3,8 @@ const session = require("express-session");
 const cors = require("cors");
 const { Pool } = require("pg");
 const querystring = require("querystring");
+const fs = require("fs");
+const https = require("https");
 require("dotenv").config();
 
 const app = express();
@@ -22,18 +24,20 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: { secure: true }, // Set to true when using HTTPS
   })
 );
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
-const REDIRECT_URI = "http://localhost:3000/callback";
+const REDIRECT_URI = "https://server.rakibshahid.com/callback"; // Update to use HTTPS
 const SCOPE = "identify";
 
 // Discord login route
 app.get("/login", (req, res) => {
-  const authURL = `https://discord.com/oauth2/authorize?client_id=1276713610126561392&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=identify`;
+  const authURL = `https://discord.com/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&scope=${SCOPE}`;
   res.redirect(authURL);
 });
 
@@ -46,7 +50,7 @@ app.get("/callback", async (req, res) => {
   }
 
   try {
-    const response = await fetch("https://discord.com/api/oauth2/token", {
+    const response = await fetch("https://discord.com/api/v/oauth2/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -69,7 +73,6 @@ app.get("/callback", async (req, res) => {
 
     const data = await response.json();
     const { access_token } = data;
-    // console.log("Access Token:", access_token);
 
     // Fetch user details from Discord API
     const userResponse = await fetch("https://discord.com/api/v10/users/@me", {
@@ -92,6 +95,7 @@ app.get("/callback", async (req, res) => {
     res.status(500).json({ message: "Error during authentication" });
   }
 });
+
 const ensureAuthenticated = (req, res, next) => {
   if (req.session && req.session.user) {
     return next();
@@ -118,9 +122,6 @@ app.get("/user", async (req, res) => {
     }
 
     const user = await response.json();
-    // console.log("User:", user);
-    // console.log("User ID:", user.id);
-    // console.log("User avatar:", user.avatar);
     const profilePictureUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
 
     res.json({
@@ -133,7 +134,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
-// check if username is in registered table
+// Check if username is in registered table
 const checkIfRegistered = async (username) => {
   const result = await pool.query(
     "SELECT * FROM registered WHERE username = $1",
@@ -142,7 +143,7 @@ const checkIfRegistered = async (username) => {
   return result.rows.length > 0;
 };
 
-// check if username is in users table
+// Check if username is in users table
 const checkIfUserExists = async (username) => {
   const result = await pool.query("SELECT * FROM users WHERE username = $1", [
     username,
@@ -150,7 +151,7 @@ const checkIfUserExists = async (username) => {
   return result.rows.length > 0;
 };
 
-// register new user
+// Register new user
 app.post("/register", async (req, res) => {
   const { username } = req.body;
 
@@ -167,30 +168,6 @@ app.post("/register", async (req, res) => {
       return res.json({ message: "Invalid name" });
     }
   }
-
-  //   // add username to registered table
-  //   await pool.query("INSERT INTO registered (username) VALUES ($1)", [username]);
-
-  //   try {
-  //     // check if username is valid
-  //     // thanks alfa-leetcode-api
-  //     const response = await fetch(
-  //       `https://alfa-leetcode-api.onrender.com/${username}`
-  //     );
-  //     const data = await response.json();
-
-  //     if (data.errors) {
-  //       return res.json({ message: "Invalid name" });
-  //     }
-
-  //     if (data.username) {
-  //       // add to users table if valid
-  //       await pool.query("INSERT INTO users (username) VALUES ($1)", [username]);
-  //       return res.json({ message: `${data.username} has been registered` });
-  //     }
-  //   } catch (error) {
-  //     return res.status(500).json({ message: "Error checking username" });
-  //   }
 
   return res.status(500).json({ message: "Unknown error" });
 });
@@ -275,8 +252,8 @@ app.get("/api/discord_lookup", async (req, res) => {
       `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
     );
     const data = await response.json();
-    localrank = -1;
-    // calculate the local ranking of the user in the points table
+    let localrank = -1;
+    // Calculate the local ranking of the user in the points table
     const ranking_result = await pool.query(
       `SELECT ranking FROM (SELECT user_id, points, RANK() OVER (ORDER BY points DESC) AS ranking FROM points) ranked_points JOIN users ON ranked_points.user_id = users.id WHERE users.username = '${leetcodeUsername}';`
     );
@@ -312,44 +289,8 @@ app.get("/api/leetcode_lookup", async (req, res) => {
       `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
     );
     const data = await response.json();
-    localrank = -1;
-    // calculate the local ranking of the user in the points table
-    const result = await pool.query(
-      `SELECT ranking FROM (SELECT user_id, points, RANK() OVER (ORDER BY points DESC) AS ranking FROM points) ranked_points JOIN users ON ranked_points.user_id = users.id WHERE users.username = '${leetcodeUsername}';`
-    );
-    if (result.rows.length != 0) {
-      localrank = result.rows[0].ranking;
-    }
+
     // Send the LeetCode stats
-    res.json({
-      leetcode_username: data.username,
-      ranking: data.ranking,
-      local_ranking: localrank,
-      avatar: data.avatar,
-    });
-  } catch (error) {
-    console.error("Error fetching LeetCode stats:", error);
-    res.status(500).json({ message: "Error fetching LeetCode stats" });
-  }
-});
-
-app.get("/api/leetcode_ac", async (req, res) => {
-  const leetcodeUsername = req.headers["leetcode-username"];
-
-  if (!leetcodeUsername) {
-    return res
-      .status(400)
-      .json({ message: "LeetCode username header is required" });
-  }
-
-  try {
-    // Fetch LeetCode stats from external API
-    const response = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/acSubmission`
-    );
-    const data = await response.json();
-
-    //   send the data response
     res.json(data);
   } catch (error) {
     console.error("Error fetching LeetCode stats:", error);
@@ -357,5 +298,20 @@ app.get("/api/leetcode_ac", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// SSL/TLS certificate files
+const privateKey = fs.readFileSync(
+  "/etc/letsencrypt/live/server.rakibshahid.com/privkey.pem"
+);
+const certificate = fs.readFileSync(
+  "/etc/letsencrypt/live/server.rakibshahid.com/fullchain.pem"
+);
+
+const credentials = { key: privateKey, cert: certificate };
+
+// Create HTTPS server
+const httpsServer = https.createServer(credentials, app);
+
+const PORT = process.env.PORT || 443;
+httpsServer.listen(PORT, () => {
+  console.log(`HTTPS Server running on port ${PORT}`);
+});
