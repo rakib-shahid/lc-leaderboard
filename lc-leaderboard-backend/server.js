@@ -198,9 +198,10 @@ app.post("/register", async (req, res) => {
 app.get("/leaderboard", async (req, res) => {
   try {
     const result = await pool.query(`
-        SELECT u.username, p.points
+        SELECT u.username, p.points, ao.discord_username
         FROM points p
         JOIN users u ON p.user_id = u.id
+        JOIN account_owner ao ON ao.leetcode_username = u.username
         ORDER BY p.points DESC
         LIMIT 50;
       `);
