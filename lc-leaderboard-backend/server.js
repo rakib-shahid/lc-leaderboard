@@ -322,6 +322,16 @@ app.get("/api/leetcode_ac", async (req, res) => {
   }
 });
 
+app.get("/polls", async (req, res) => {
+  try {
+    const data = fs.readFileSync("data.json", "utf8");
+    res.json(JSON.parse(data));
+  } catch (error) {
+    console.error("Error reading data.json:", error);
+    res.status(500).json({ message: "Error reading data.json" });
+  }
+});
+
 // SSL/TLS certificate files
 const privateKey = fs.readFileSync("privkey.pem");
 const certificate = fs.readFileSync("fullchain.pem");
