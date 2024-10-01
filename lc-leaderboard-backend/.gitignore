@@ -1,0 +1,10 @@
+/garbage/
+*.pem
+*.out
+*.log
+test.py
+/util/
+news.json
+data.json
+*.sh
+refreshpolls.py
