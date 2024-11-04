@@ -6,6 +6,8 @@ const querystring = require("querystring");
 const fs = require("fs");
 const https = require("https");
 const NodeCache = require("node-cache"); // Import node-cache
+const validator = require('validator');
+
 require("dotenv").config();
 
 const app = express();
@@ -21,7 +23,7 @@ const pool = new Pool({
 });
 
 // Initialize cache
-const cache = new NodeCache({ stdTTL: 1800 }); // Cache TTL of 1 hour
+const cache = new NodeCache({ stdTTL: 600 }); // Cache TTL of 1 hour
 
 app.use(
   session({
@@ -222,7 +224,7 @@ app.get("/api/leetcode-stats", async (req, res) => {
 
     // Fetch data from external LeetCode API
     const response = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
+      `http://localhost:3000/${leetcodeUsername}`
     );
     const data = await response.json();
 
@@ -272,7 +274,7 @@ app.get("/api/discord_lookup", async (req, res) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
+      `http://localhost:3000/${leetcodeUsername}`
     );
     const data = await response.json();
     let localrank = -1;
@@ -351,7 +353,7 @@ app.get("/api/leetcode_lookup", async (req, res) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}`
+      `http://localhost:3000/${leetcodeUsername}`
     );
     const data = await response.json();
 
@@ -413,7 +415,7 @@ app.get("/api/leetcode_ac", async (req, res) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `https://alfa-leetcode-api.onrender.com/${leetcodeUsername}/acSubmission`
+      `http://localhost:3000/${leetcodeUsername}/acSubmission`
     );
     const data = await response.json();
 
@@ -448,6 +450,41 @@ app.get("/news", async (req, res) => {
     res.status(500).json({ message: "Error reading news.json" });
   }
 });
+
+const vercelPool = new Pool({
+    user: process.env.VERCELDB_USER,
+    host: process.env.VERCELDB_HOST,
+    database: process.env.VERCELDB_DATABASE,
+    password: process.env.VERCELDB_PASSWORD,
+    port: process.env.VERCELDB_PORT,
+    ssl: {
+        rejectUnauthorized: true // This ensures SSL is required and certificates are verified
+    }
+  });
+
+app.post('/api/subscribe', async (req, res) => {
+    const { email } = req.body;
+    
+    if (!validator.isEmail(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+    }
+    
+    try {
+        const result = await vercelPool.query(
+            "INSERT INTO mailing_list (email) VALUES ($1) RETURNING *",
+            [email]
+        );
+        res.status(201).json({ message: "Successfully subscribed", data: result.rows[0] });
+    } catch (error) {
+        if (error.code === '23505') {
+            res.status(409).json({ message: "Email already exists in the mailing list" });
+        } else {
+            res.status(500).json({ message: "An error occurred", error: error.message });
+        }
+        console.error(error);
+    }
+});
+
 
 // SSL/TLS certificate files
 const privateKey = fs.readFileSync("privkey.pem");
