@@ -458,7 +458,7 @@ const vercelPool = new Pool({
     password: process.env.VERCELDB_PASSWORD,
     port: process.env.VERCELDB_PORT,
     ssl: {
-        rejectUnauthorized: true // This ensures SSL is required and certificates are verified
+        rejectUnauthorized: false
     }
   });
 
@@ -476,11 +476,7 @@ app.post('/api/subscribe', async (req, res) => {
         );
         res.status(201).json({ message: "Successfully subscribed", data: result.rows[0] });
     } catch (error) {
-        if (error.code === '23505') {
-            res.status(409).json({ message: "Email already exists in the mailing list" });
-        } else {
-            res.status(500).json({ message: "An error occurred", error: error.message });
-        }
+        res.status(500).json({ message: "An error occurred", error: error.message });
         console.error(error);
     }
 });
