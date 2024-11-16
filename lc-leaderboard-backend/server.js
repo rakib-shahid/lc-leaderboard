@@ -21,6 +21,18 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
+const vercelPool = new Pool({
+    user: process.env.VERCELDB_USER,
+    host: process.env.VERCELDB_HOST,
+    database: process.env.VERCELDB_DATABASE,
+    password: process.env.VERCELDB_PASSWORD,
+    port: process.env.VERCELDB_PORT,
+    ssl: {
+        rejectUnauthorized: false,
+    },
+
+    });
+
 const cache = new NodeCache({ stdTTL: 600 });
 
 app.use(session({
@@ -35,7 +47,7 @@ app.use('/leaderboard', require('./routes/leaderboard')(pool, cache));
 app.use('/api', require('./routes/leetcode')(pool, cache));
 app.use('/polls', require('./routes/polls'));
 app.use('/news', require('./routes/news'));
-app.use('/api/subscribe', require('./routes/subscribe')(pool));
+app.use('/api/subscribe', require('./routes/subscribe')(vercelPool));
 
 const privateKey = fs.readFileSync("privkey.pem");
 const certificate = fs.readFileSync("fullchain.pem");
