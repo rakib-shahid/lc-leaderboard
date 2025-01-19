@@ -1,4 +1,4 @@
-# lc-leaderboard
+# OLD BRANCH lc-leaderboard
 
 a leaderboard to encourage leetcode
 
