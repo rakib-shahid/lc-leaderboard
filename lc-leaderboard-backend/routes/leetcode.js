@@ -30,7 +30,7 @@ module.exports = (pool, cache) => {
 
     // Fetch data from external LeetCode API
     const response = await fetch(
-      `http://localhost:3000/${leetcodeUsername}`
+      `http://localhost:3001/${leetcodeUsername}`
     );
     const data = await response.json();
 
@@ -80,7 +80,7 @@ module.exports = (pool, cache) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `http://localhost:3000/${leetcodeUsername}`
+      `http://localhost:3001/${leetcodeUsername}`
     );
     const data = await response.json();
     let localrank = -1;
@@ -158,7 +158,7 @@ module.exports = (pool, cache) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `http://localhost:3000/${leetcodeUsername}`
+      `http://localhost:3001/${leetcodeUsername}`
     );
     const data = await response.json();
 
@@ -219,7 +219,7 @@ module.exports = (pool, cache) => {
 
     // Fetch LeetCode stats from external API
     const response = await fetch(
-      `http://localhost:3000/${leetcodeUsername}/acSubmission`
+      `http://localhost:3001/${leetcodeUsername}/acSubmission`
     );
     const data = await response.json();
 
