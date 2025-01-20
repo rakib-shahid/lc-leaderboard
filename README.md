@@ -2,6 +2,8 @@
 
 a leaderboard to encourage leetcode
 
+This branch contains the Express backend only. Outdated original front end is in the old branch. New front end is [here](https://github.com/rakib-shahid/Code-For-All-Website).
+
 ### Changelog
 
 - Added local ranking to leetcode lookup
@@ -16,6 +18,6 @@ a leaderboard to encourage leetcode
 
 - ~~show 5 most recent accepted submission for user lookup~~
   - ~~fix default user ac not available upon loading lookup~~
-- fix fetchstat logic, not happy with current implementation
-- create backend that awards points
-- create discord bot that registers users
+- ~~fix fetchstat logic, not happy with current implementation~~
+- ~~create backend that awards points~~
+- ~~create discord bot that registers users~~
